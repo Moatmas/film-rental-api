@@ -19,7 +19,6 @@ export class MailService {
       zone: payload.timezone,
     }).toFormat('dd/MM/yyyy à HH:mm');
 
-    // Simulation d'envoi d'email (remplacer par Nodemailer / SendGrid en prod)
     this.logger.log(
       '\n' +
       '┌─────────────────────────────────────────────────────┐\n' +
@@ -36,7 +35,6 @@ export class MailService {
       '└─────────────────────────────────────────────────────┘',
     );
 
-    // Simulation latence réseau
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
 }

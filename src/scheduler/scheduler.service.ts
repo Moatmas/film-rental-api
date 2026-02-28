@@ -32,7 +32,6 @@ export class SchedulerService {
     private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  // ── Planifier les notifications lors de la création d'une location ────────
 
   async scheduleRentalNotifications(
     rental: Rental,
@@ -46,7 +45,6 @@ export class SchedulerService {
     for (const type of ['J-5', 'J-3'] as NotificationType[]) {
       const daysOffset = type === 'J-5' ? 5 : 3;
 
-      // 12h00 dans le fuseau du client, J-N avant la date de retour
       const scheduledAt = returnDate
         .minus({ days: daysOffset })
         .set({ hour: 12, minute: 0, second: 0, millisecond: 0 });
@@ -77,9 +75,7 @@ export class SchedulerService {
     return saved;
   }
 
-  // ── CRON : tous les jours à 12h00 UTC ────────────────────────────────────
-  // Les timestamps étant stockés en UTC avec prise en compte du fuseau client,
-  // un seul CRON quotidien suffit pour tous les fuseaux.
+  // ── CRON : tous les jours à 12h00 UTC ──────
 
   @Cron('0 12 * * *', { name: 'reminder-J-5', timeZone: 'UTC' })
   async handleJ5Reminder(): Promise<void> {
@@ -93,7 +89,6 @@ export class SchedulerService {
     await this.processNotifications('J-3');
   }
 
-  // ── Traitement effectif des notifications ─────────────────────────────────
 
   async processNotifications(type: NotificationType): Promise<number> {
     const now = new Date();
@@ -151,7 +146,6 @@ export class SchedulerService {
     await this.notifRepo.save(notif);
   }
 
-  // ── API : Lister toutes les notifications ────────────────────────────────
 
   async findAllNotifications(): Promise<ScheduledNotification[]> {
     return this.notifRepo.find({
@@ -160,7 +154,6 @@ export class SchedulerService {
     });
   }
 
-  // ── API : Déclencher une notification individuelle ────────────────────────
 
   async triggerManually(id: number): Promise<ScheduledNotification> {
     const notif = await this.notifRepo.findOne({
@@ -174,13 +167,11 @@ export class SchedulerService {
       );
     }
 
-    // Force le statut à PENDING pour permettre le renvoi
     notif.status = 'PENDING';
     await this.sendNotification(notif);
     return notif;
   }
 
-  // ── API : État d'une notification ─────────────────────────────────────────
 
   async getNotificationStatus(id: number): Promise<ScheduledNotification> {
     const notif = await this.notifRepo.findOne({
@@ -191,7 +182,6 @@ export class SchedulerService {
     return notif;
   }
 
-  // ── API : Déclencher un CRON entier par son nom ───────────────────────────
 
   async triggerCronByName(name: CronName): Promise<{ processed: number }> {
     if (!ALLOWED_CRON_NAMES.includes(name)) {
@@ -204,7 +194,6 @@ export class SchedulerService {
     return { processed };
   }
 
-  // ── API : Infos sur les jobs CRON enregistrés ─────────────────────────────
 
   getCronJobs(): Record<string, { next: Date | null }> {
     const result: Record<string, { next: Date | null }> = {};

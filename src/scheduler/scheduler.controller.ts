@@ -48,7 +48,6 @@ export class SchedulerController {
 
   /**
    * Infos sur les CRON (prochain déclenchement)
-   * ⚠️ Ce GET doit être déclaré AVANT le POST /:name/trigger
    */
   @Get('cron')
   @ApiOperation({ summary: 'Voir les CRON enregistrés et leur prochain déclenchement' })

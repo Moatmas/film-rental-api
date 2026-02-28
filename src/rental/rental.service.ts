@@ -1,4 +1,3 @@
-// src/rental/rental.service.ts
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,7 +26,6 @@ export class RentalService {
 
     const tz = customer.timezone;
 
-    // Interprétation des dates dans le fuseau du client
     const rentalDate = DateTime.fromISO(dto.rental_date, { zone: tz });
     const returnDate = DateTime.fromISO(dto.return_date, { zone: tz });
 
@@ -49,12 +47,11 @@ export class RentalService {
       inventory_id: dto.inventory_id,
       rental_date: rentalDate.toJSDate(),
       return_date: returnDate.toJSDate(),
-      staff_id: 1, // staff par défaut
+      staff_id: 1, 
     });
 
     const saved = await this.rentalRepo.save(rental);
 
-    // Planification des notifications après création
     await this.schedulerService.scheduleRentalNotifications(saved, customer);
 
     return saved;
